@@ -1,6 +1,12 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Answers, Question, Recommendation } from '../types';
 
+declare const process: {
+  env: {
+    API_KEY?: string;
+  };
+};
+
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 const MEMBERSHIP_TIERS_CONTEXT = `
@@ -44,7 +50,6 @@ Here are the available membership tiers:
 - **Summary:** Premium coaching, advanced resources, early access, and exclusive VIP perks.
 `;
 
-
 export const getAiRecommendation = async (answers: Answers, questions: Question[]): Promise<Recommendation> => {
   const formattedAnswers = questions
     .map(q => {
@@ -70,7 +75,7 @@ export const getAiRecommendation = async (answers: Answers, questions: Question[
     2. Present the recommended membership as the clear plan that will help them succeed. Connect specific features of the tier to their needs.
     3. Paint a picture of success. Describe what their professional life will look like after they've used the plan.
     4. Keep the language simple and clear. Avoid jargon. Use short sentences and paragraphs.
-    5. Use markdown for formatting (e.g., using '\n' for new paragraphs) and keep it to 2-3 paragraphs.
+    5. Use markdown for formatting (e.g., using '\\n' for new paragraphs) and keep it to 2-3 paragraphs.
 
     Survey Results:
     ${formattedAnswers}
@@ -103,7 +108,7 @@ export const getAiRecommendation = async (answers: Answers, questions: Question[
         }
     });
 
-    const jsonText = response.text.trim();
+    const jsonText = response.text?.trim() ?? '';
     const result = JSON.parse(jsonText);
     
     // Basic validation to ensure the result matches the Recommendation type
